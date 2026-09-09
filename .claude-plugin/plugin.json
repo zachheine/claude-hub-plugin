@@ -1,0 +1,9 @@
+{
+  "name": "hub",
+  "description": "Run a Claude Code session as the HUB in a hub-and-spoke multi-session workflow: scope work, write self-contained briefs, fence files, spawn spoke sessions in git worktrees, and review and merge their PRs. Includes measured fixes for spoke permission prompting and model inheritance.",
+  "version": "1.0.0",
+  "author": { "name": "Zach Heineman" },
+  "homepage": "https://github.com/zachheine/claude-hub-plugin",
+  "repository": "https://github.com/zachheine/claude-hub-plugin",
+  "keywords": ["worktree", "multi-session", "hub-and-spoke", "coordination", "parallel"]
+}

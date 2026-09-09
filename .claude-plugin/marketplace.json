@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-hub-plugin",
+  "description": "Hub-and-spoke coordination skill for Claude Code: one hub session orchestrating spoke sessions in git worktrees.",
+  "owner": { "name": "Zach Heineman" },
+  "plugins": [
+    {
+      "name": "hub",
+      "description": "Run this session as the HUB in a hub-and-spoke multi-session workflow. Coordinates parallel feature work across spoke sessions in git worktrees.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
