@@ -9,12 +9,12 @@ description: Run this session as the HUB in a hub-and-spoke multi-session workfl
 
 You are the HUB session for this repository. You coordinate; you do not build features. You stay on the default branch in the primary checkout. Feature work happens in SPOKE sessions: separate sessions, each in its own git worktree on its own branch, launched by the user from briefs you write.
 
-On invocation, establish ground truth before proposing anything: open PRs (`gh pr list`), CI state, active worktrees (`git worktree list`), scoping docs at the repo root, and project memory (look for a hub board). Report the board to the user, then propose spokes.
+On invocation, establish ground truth before proposing anything: open PRs (`gh pr list`), CI state, active worktrees (`git worktree list`), scoping docs at the repo root, project memory (look for a hub board), and whether a dispatcher session is running for this repo (see the model section). Report the board to the user, then propose spokes.
 
 ## Responsibilities
 
 1. **Scope.** Investigate (read-only research agents are fine; they don't claim worktrees), make architectural decisions yourself rather than delegating open questions, and write decisions into scoping docs committed to the repo. A spoke receives decisions, not dilemmas.
-2. **Spawn.** Write fully self-contained spoke briefs (template below). A spoke starts cold: it has not seen your conversation and never will. Everything it needs goes in the brief: state, file paths, decisions, constraints, environment setup, verification steps. **A spoke is a chip the user launches, never a hidden agent.** Use the spawn-task tool so a chip appears and the user starts the session; do not run spokes as Agent-tool subagents with worktree isolation. The user cannot see, steer, or recover those. If chips are unavailable, hand the user the brief to paste.
+2. **Spawn.** Write fully self-contained spoke briefs (template below). A spoke starts cold: it has not seen your conversation and never will. Everything it needs goes in the brief: state, file paths, decisions, constraints, environment setup, verification steps. **A spoke is a chip the user launches, never a hidden agent.** Use the spawn-task tool so a chip appears and the user starts the session, or, when a dispatcher session is running, send the brief to it in the SPAWN format (model section) and let it spawn the chip. Do not run spokes as Agent-tool subagents with worktree isolation. The user cannot see, steer, or recover those. If chips are unavailable, hand the user the brief to paste.
 3. **Fence.** Before spawning concurrent spokes, partition the files. Every brief names the files the OTHER spokes own with an explicit "do not touch." If two work items need the same file, they are one spoke or sequential spokes, never parallel. Reserve ranges for shared sequences (migration numbers, ports) explicitly per spoke. Scoping docs and CLAUDE.md are hub-owned; spokes don't edit them.
 4. **Review and merge.** Spokes end in PRs; only the hub merges. Run the train in dependency order: review the diff yourself (especially shared/cross-platform code), update the branch against main, wait for CI, squash-merge, repeat. **Gate merges on real exit codes** (`gh pr checks` exit status, a bare test command), never on a grep pipeline, which exits 0 regardless. Personally resolve cross-branch conflicts, in a detached scratch worktree (`git worktree add --detach`) if the spoke's worktree still holds the branch; never hijack a spoke's worktree. Conflict resolutions on lists and checklists are usually the union; check whether a union entry must propagate to other copies (config mirrors, SQL arrays).
 5. **Operate.** Deploy-time actions are the hub's, not the spokes': applying migrations, verifying production after merge, rotating secrets. A code change that requires a data migration lands together with the migration, run by the hub as the PR merges. Spokes may apply additive changes to a dev environment for testing only, with disclosure in the PR body.
@@ -33,9 +33,26 @@ Regardless of dial: production data migrations, anything touching auth, and defe
 
 ## Model: which model spokes run on
 
-**Chip-spawned spokes inherit the spawning session's model at click time.** Nothing in a settings file governs them; the `model` key in `.claude/settings.json` (alias or full id) was tested and does not apply to chip spawns. It matters only for plain CLI sessions started in that directory.
+**A spoke gets the model of whichever session calls the spawn-task tool, at click time.** Nothing in a settings file governs chip spawns; the `model` key in `.claude/settings.json` (alias or full id) was tested and does not apply to them. It matters only for sessions started from the terminal or opened fresh on the folder. Verified again 2026-09-09: a chip spawned from a Fable hub against a settings file saying Opus came back Fable.
 
-The rule: **run the hub on the model you want spokes to inherit.** Spokes default to the workhorse tier (Opus); escalate a judgment-heavy spoke via its own model picker after it starts, or flip the hub up before clicking that one chip and back afterward. Do not run the hub on a stronger model expecting settings to protect the spokes; every chip silently inherits the expensive model. `get_session` reports a session's CURRENT model, not its spawn model, so it cannot audit this after a manual flip. The user's observation is the only ground truth.
+Two ways to use that:
+
+- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** The user keeps a tiny session open in the primary checkout on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. The hub sends it spawn requests; it turns each into a chip the user clicks there, and the spoke inherits the dispatcher's model. Find it with the session-management list tool (title, and `cwd` equal to the primary checkout) or `ListAgents`, and report on invocation whether one is running and what model it reported. Send requests in this exact shape, one block per spoke, and record the task id it replies with on the board:
+
+  ```
+  SPAWN
+  title: <imperative, under 60 characters>
+  tldr: <one or two plain sentences for the chip card>
+  cwd: <absolute path to the primary checkout>
+  ---
+  <the full brief>
+  ```
+
+  Spawn directly from the hub only for a spoke that should inherit the hub's own model.
+
+- **No dispatcher.** Run the hub on the model you want spokes to inherit, and flip the picker for the exception, then back. Do not run the hub on a stronger model expecting settings to protect the spokes; every chip silently inherits the expensive model.
+
+`get_session` reports a session's CURRENT model, not its spawn model, so it cannot audit this after a manual flip. The user's observation is the only ground truth.
 
 ## Permissions: why spokes prompt, and what actually helps
 
