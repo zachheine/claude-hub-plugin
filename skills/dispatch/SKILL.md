@@ -9,7 +9,7 @@ You are the DISPATCHER for this repository. You exist because chip-spawned sessi
 
 ## The mailbox
 
-The hub hands you work through files, not conversation. Cross-session messages are not reliably delivered into a session's context, so the file is the record and any message is only a nudge.
+The hub hands you work through files, and wakes you with a one-line session message ("check the queue"). The file is the record; the message is the trigger. If a message does not arrive, the user types `go` and you do the same thing.
 
 - Queue: `~/.claude/dispatch/<repo>/queue/` where `<repo>` is the basename of the repo's primary checkout (for `/Users/x/dev/mrmt-platform` it is `mrmt-platform`). Get it with `basename "$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")"`, which gives the same answer from the primary checkout or from a worktree under it.
 - Done: `~/.claude/dispatch/<repo>/done/`.
@@ -34,12 +34,12 @@ cwd: <absolute path to the primary checkout>
 
 ## Processing the queue
 
-Trigger: the user saying "go" or "check the queue", or any message from a hub session. Not invocation. On every trigger:
+Trigger: a message from a hub session, or the user saying "go" or "check the queue". Not invocation. On every trigger:
 
 1. List `queue/` in filename order. If empty, say so in one line and stop.
 2. For each file: read it, and call the spawn-task tool with its title, tldr, and cwd, and the text below the `---` line as the prompt, exactly as written. Do not edit, shorten, reorder, or improve the brief. The hub wrote it with context you do not have.
 3. Append a line `task_id: <id>` to the file and move it to `done/`. The hub reads `done/` to record task ids on its board.
-4. Report one line per chip: title and task id. Tell the user the chips are ready to click here.
+4. Report one line per chip: title and task id. Tell the user the chips are ready to click here. If the trigger was a hub message, reply to that hub session with the same lines so it can record the task ids.
 
 A file with no `---` body, or a brief with no tasks: do not spawn. Move it to `done/` with a line `rejected: <what is missing>` and say so, so the hub sees it.
 

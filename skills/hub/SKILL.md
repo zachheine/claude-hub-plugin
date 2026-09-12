@@ -52,7 +52,7 @@ Two ways to use that:
   <the full brief>
   ```
 
-  Then tell the user: "<N> briefs queued; type `go` in Dispatcher - <repo>." You may also send the dispatcher a one-line session message as a nudge, but cross-session messages are not reliably delivered into a session's context, so the file is the record and the user's `go` is the trigger. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
+  Then send the dispatcher a one-line session message, "check the queue", by session id. The delivery result tells you what happened: "delivered" means it is spawning and you can tell the user the chips are appearing in Dispatcher - <repo>; "queued" means it will act when its current turn ends; "undelivered" means it is blocked, usually on an approval dialog from its first invocation, so tell the user to look at that session and type `go`. The file is the record either way; the message is the trigger. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
 
   Spawn directly from the hub only for a spoke that should inherit the hub's own model.
 
