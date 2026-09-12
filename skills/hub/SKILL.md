@@ -37,7 +37,9 @@ Regardless of dial: production data migrations, anything touching auth, and defe
 
 Two ways to use that:
 
-- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** The user keeps a tiny session open in the primary checkout on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. The hub sends it spawn requests; it turns each into a chip the user clicks there, and the spoke inherits the dispatcher's model. Find it with the session-management list tool (title, and `cwd` equal to the primary checkout) or `ListAgents`, and report on invocation whether one is running and what model it reported. Send requests in this exact shape, one block per spoke, and record the task id it replies with on the board:
+- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** The user keeps a tiny session open in the primary checkout on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. The hub queues briefs for it as files; it turns each into a chip the user clicks there, and the spoke inherits the dispatcher's model. Find it with the session-management list tool (title, and `cwd` equal to the primary checkout) and report on invocation whether one is running and what model it shows.
+
+  To spawn through it, write one file per spoke to `~/.claude/dispatch/<repo>/queue/<timestamp>-<slug>.md` (`<repo>` is the basename of the primary checkout), containing exactly:
 
   ```
   SPAWN
@@ -47,6 +49,8 @@ Two ways to use that:
   ---
   <the full brief>
   ```
+
+  Then nudge the dispatcher with a one-line session message ("check the queue"). Cross-session messages are not reliably delivered into a session's context, so the file is the record and the message is only a wake-up: if delivery is reported as undelivered, tell the user to type `go` in the dispatcher. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
 
   Spawn directly from the hub only for a spoke that should inherit the hub's own model.
 

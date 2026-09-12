@@ -1,7 +1,7 @@
 {
   "name": "hub",
   "description": "Hub-and-spoke workflow for Claude Code: a hub session that scopes, briefs, fences, and merges; spokes in git worktrees; and a model-pinned dispatcher so spokes inherit the model you want without touching a picker. Includes measured fixes for spoke permission prompting.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "Zach Heineman"
   },
