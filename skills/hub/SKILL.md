@@ -37,7 +37,9 @@ Regardless of dial: production data migrations, anything touching auth, and defe
 
 Two ways to use that:
 
-- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** The user keeps a tiny session open in the primary checkout on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. The hub queues briefs for it as files; it turns each into a chip the user clicks there, and the spoke inherits the dispatcher's model. Find it with the session-management list tool (title, and `cwd` equal to the primary checkout) and report on invocation whether one is running and what model it shows.
+- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** A tiny second session on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. The hub queues briefs for it as files; it turns each into a chip the user clicks there, and the spoke inherits the dispatcher's model.
+
+  **On invocation, find it** with the session-management list tool: title starting `Dispatcher -`, `cwd` in this repo (primary checkout or a worktree under it). Report whether one is running and what model it shows. **If none is running, spawn one:** a chip titled `Open dispatcher for <repo>`, `cwd` the primary checkout, with the prompt "Invoke the dispatch skill (/dispatch) and follow it. Do nothing else." Then tell the user the three steps: click the chip, flip that session's picker to Opus when it reports its model, and type `go` there whenever the hub says briefs are queued. The dispatcher lives in the worktree the chip creates; it never commits, and the hub's worktree cleanup must leave it alone while it is running.
 
   To spawn through it, write one file per spoke to `~/.claude/dispatch/<repo>/queue/<timestamp>-<slug>.md` (`<repo>` is the basename of the primary checkout), containing exactly:
 
@@ -50,7 +52,7 @@ Two ways to use that:
   <the full brief>
   ```
 
-  Then nudge the dispatcher with a one-line session message ("check the queue"). Cross-session messages are not reliably delivered into a session's context, so the file is the record and the message is only a wake-up: if delivery is reported as undelivered, tell the user to type `go` in the dispatcher. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
+  Then tell the user: "<N> briefs queued; type `go` in Dispatcher - <repo>." You may also send the dispatcher a one-line session message as a nudge, but cross-session messages are not reliably delivered into a session's context, so the file is the record and the user's `go` is the trigger. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
 
   Spawn directly from the hub only for a spoke that should inherit the hub's own model.
 
