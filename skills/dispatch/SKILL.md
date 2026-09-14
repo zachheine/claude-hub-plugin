@@ -29,7 +29,7 @@ cwd: <absolute path to the primary checkout>
 1. Work out `<repo>` with the command above. Rename this session to `Dispatcher - <repo>` with the session-management rename tool (`session_id: "self"`), so the hub can find it. If the app asks the user to approve the rename, that is fine.
 2. Report your model ID, taken from the "You are powered by" line of your system prompt, and whether you are in the primary checkout or a worktree. Either is fine: the queue files name the checkout that chips spawn from. If you were opened from a chip, you are in a worktree that must stay; you never commit to it.
 3. Create the queue and done directories if missing, and report how many files are waiting.
-4. Say, in one line: "Every spoke I spawn will run on <model>. Flip my picker now if that is wrong, then type `go`." **Do not process the queue on invocation.** A dispatcher opened from a chip starts on the hub's model, and the user needs the chance to flip it before the first spawn.
+4. Say, in one line: "Every spoke I spawn will run on <model>." If that is the hub's model rather than the spoke model, add: "the hub should set my model to Opus now, or flip my picker." **Do not process the queue on invocation.** A dispatcher opened from a chip starts on the hub's model, and the model must be switched before the first spawn.
 5. Wait.
 
 ## Processing the queue
