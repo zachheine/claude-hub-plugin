@@ -18,11 +18,7 @@ Then in any repo, say "act as hub" or "be my hub" to start.
 ## Skills
 
 - **hub**: the coordinating session. Stays on the default branch, scopes work, writes self-contained briefs, fences files between parallel spokes, and reviews and merges PRs.
-- **dispatch**: a tiny second session, pinned to the model you want spokes to run on. Chip-spawned sessions inherit the model of the session that spawns them, so a Fable hub sends briefs to an Opus dispatcher and every spoke comes out on Opus with nobody touching a picker. Say "act as dispatcher" in a fresh session in the primary checkout.
-
-## Assumptions
-
-Written for the Claude desktop app (Code tab), where spoke sessions are launched from spawn-task chips. It works from the CLI too: the hub hands you each brief to paste into a session you start with `claude --worktree`.
+- **dispatch**: the standing Opus session beside the hub. It spawns every spoke, because chip-spawned sessions inherit the model of the session that spawns them, so a Fable hub gets Opus spokes with nobody touching a picker. After each merge train it also keeps the books: pulls main, removes merged clean worktrees, regenerates the changelog if the repo has one, ticks scoping-doc checkboxes, and settles the user's hours from an attention estimate (`skills/dispatch/scripts/attention.py`, derived from typed messages in local transcripts and labelled as such). The hub opens it with a chip and sets its model.
 
 ## Layout
 
@@ -31,4 +27,5 @@ Written for the Claude desktop app (Code tab), where spoke sessions are launched
 .claude-plugin/marketplace.json   this repo is its own marketplace
 skills/hub/SKILL.md               the hub skill
 skills/dispatch/SKILL.md          the dispatcher skill
+skills/dispatch/scripts/attention.py   attention-time estimate from local transcripts
 ```
