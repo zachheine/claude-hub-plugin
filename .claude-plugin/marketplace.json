@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "hub",
-      "description": "Hub-and-spoke multi-session workflow: hub skill for coordination, dispatch skill for model-pinned spoke spawning.",
+      "description": "Hub-and-spoke multi-session workflow: hub skill for coordination, dispatch skill for model-pinned spawning and bookkeeping, changelog skill for a git-derived changelog.",
       "source": "./",
       "category": "productivity"
     }
