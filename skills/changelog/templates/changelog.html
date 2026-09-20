@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changelog</title>
+<!--
+  changelog.html — the reference page for a git-derived changelog.
+
+  Drop this beside a `changelog.json` written by scripts/changelog.mjs and
+  serve the directory. No build step, no framework, no CDN, no fonts to fetch.
+
+  THIS IS A REFERENCE, NOT A DESTINATION. A repo with a Next or Astro app
+  should render the same payload server-side in its own stack and its own
+  design; this file exists so that a repo with no app still gets the page, and
+  so that the shape of the payload has one worked example to read.
+
+  It computes nothing about history. Everything on screen is a field of the
+  payload; the only arithmetic is grouping entries by month and counting them
+  per kind.
+
+  STANDING. Set `window.CHANGELOG_BUILD_COMMIT` to the commit the running build
+  was made from (a deploy stamps it) and the page says whether the list is
+  complete as of that build. Unset, the page says it cannot tell — which is a
+  real state and prints as one. Guessing "current" here would be the exact lie
+  the whole page is against.
+-->
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --panel: #f6f7f9;
+    --border: #e2e5ea;
+    --text: #16191d;
+    --muted: #61697a;
+    --accent: #2f5bd7;
+    --chip-bg: #eceff5;
+    --warn-bg: #fff6e0;
+    --warn-border: #e8c97a;
+    --warn-text: #6b4f00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101215;
+      --panel: #171a1f;
+      --border: #272c34;
+      --text: #e8eaee;
+      --muted: #949cab;
+      --accent: #7ea2ff;
+      --chip-bg: #232830;
+      --warn-bg: #2a2313;
+      --warn-border: #5e4d1d;
+      --warn-text: #e5cf94;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem 1rem 6rem;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 56rem; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-size: .85rem; margin: 0 0 1.5rem; }
+  .sub code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .standing {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: .5rem;
+    padding: .7rem .9rem;
+    font-size: .85rem;
+    margin-bottom: 1.25rem;
+  }
+  .standing.behind {
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+    color: var(--warn-text);
+  }
+
+  .filters { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.5rem; }
+  .filters button {
+    font: inherit; font-size: .8rem;
+    padding: .3rem .7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .filters button[aria-pressed="false"] { opacity: .4; text-decoration: line-through; }
+
+  h2.month {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin: 2rem 0 .6rem;
+    padding-bottom: .35rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entry { padding: .7rem 0; border-bottom: 1px solid var(--border); }
+  .entry .line { display: flex; gap: .6rem; align-items: baseline; flex-wrap: wrap; }
+  .entry .subject { font-weight: 550; flex: 1 1 18rem; min-width: 0; }
+  .date, .stat { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  .chip {
+    font-size: .7rem;
+    padding: .1rem .5rem;
+    border-radius: 999px;
+    background: var(--chip-bg);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  a { color: var(--accent); }
+  a.pr { font-size: .8rem; text-decoration: none; white-space: nowrap; }
+  a.pr:hover { text-decoration: underline; }
+
+  details.steps { margin-top: .35rem; }
+  details.steps summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: .8rem;
+    list-style: revert;
+  }
+  details.steps ul { margin: .4rem 0 .2rem; padding-left: 1.2rem; }
+  details.steps li { color: var(--muted); font-size: .85rem; margin: .15rem 0; }
+  .areas { color: var(--muted); font-size: .78rem; margin-top: .25rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .empty { color: var(--muted); padding: 2rem 0; }
+  .periods { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; font-size: .82rem; color: var(--muted); }
+  .periods table { border-collapse: collapse; margin-top: .5rem; }
+  .periods td, .periods th { text-align: left; padding: .2rem .9rem .2rem 0; font-weight: normal; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Changelog</h1>
+  <p class="sub" id="sub">Loading <code>changelog.json</code>…</p>
+  <div id="standing"></div>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+  <div id="periods"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  var SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    // textContent throughout: commit subjects are arbitrary text from the
+    // repository's history and are never interpolated as markup.
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  /** `2026-09-10T…` → `Sep 10`. The year lives on the month heading. */
+  function dayLabel(iso) {
+    var m = Number(iso.slice(5, 7)), d = Number(iso.slice(8, 10));
+    return SHORT[m - 1] + ' ' + d;
+  }
+
+  function monthLabel(key) {
+    return MONTHS[Number(key.slice(5, 7)) - 1] + ' ' + key.slice(0, 4);
+  }
+
+  /**
+   * Entries in their own order, cut into months.
+   *
+   * The order is git's, not a sort: the payload is already newest-first along
+   * the first-parent line, and re-sorting by date would reorder commits whose
+   * committer dates disagree with the topology.
+   */
+  function byMonth(entries) {
+    var out = [];
+    entries.forEach(function (e) {
+      var key = e.date.slice(0, 7);
+      if (!out.length || out[out.length - 1].key !== key) out.push({ key: key, entries: [] });
+      out[out.length - 1].entries.push(e);
+    });
+    return out;
+  }
+
+  // --- kind filters, in the query string -----------------------------------
+  // `?kind=off` style: the URL carries which kinds are hidden, so a filtered
+  // view is a link somebody can send.
+
+  function hiddenKinds() {
+    var out = {};
+    var params = new URLSearchParams(location.search);
+    params.getAll('kind').forEach(function (v) {
+      v.split(',').forEach(function (part) {
+        var bits = part.split(':');
+        if (bits.length === 2 && bits[1] === 'off') out[bits[0]] = true;
+      });
+    });
+    return out;
+  }
+
+  function writeHidden(hidden) {
+    var off = Object.keys(hidden).filter(function (k) { return hidden[k]; });
+    var params = new URLSearchParams(location.search);
+    params.delete('kind');
+    off.forEach(function (k) { params.append('kind', k + ':off'); });
+    var qs = params.toString();
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+  }
+
+  function render(payload) {
+    var kinds = payload.kinds && payload.kinds.length
+      ? payload.kinds
+      : Object.keys(payload.counts.byKind || {}).map(function (id) { return { id: id, label: id }; });
+    var labels = {};
+    kinds.forEach(function (k) { labels[k.id] = k.label; });
+
+    var sub = document.getElementById('sub');
+    sub.textContent = '';
+    sub.appendChild(document.createTextNode(
+      payload.counts.total + ' changes through ' + payload.headDate.slice(0, 10) + ' · derived from '
+    ));
+    var code = el('code', null, 'git log --first-parent ' + payload.ref);
+    sub.appendChild(code);
+    sub.appendChild(document.createTextNode(' at ' + payload.headShort + '. Nothing here was written by hand.'));
+
+    // --- standing ---
+    var stand = document.getElementById('standing');
+    var build = typeof window.CHANGELOG_BUILD_COMMIT === 'string'
+      ? window.CHANGELOG_BUILD_COMMIT.trim().toLowerCase() : '';
+    var box = el('div', 'standing');
+    if (!/^[0-9a-f]{7,40}$/.test(build)) {
+      box.textContent = 'This page does not know which commit is serving it, so it cannot say '
+        + 'whether the list is complete. It is complete through ' + payload.headShort + '.';
+    } else {
+      var known = payload.entries.some(function (e) {
+        return build.length >= e.sha.length ? build.indexOf(e.sha) === 0 : e.sha.indexOf(build) === 0;
+      });
+      if (known) {
+        box.textContent = 'Complete as of this build (' + build.slice(0, 8) + ').';
+      } else {
+        box.className = 'standing behind';
+        box.textContent = 'This build (' + build.slice(0, 8) + ') is ahead of the list — '
+          + 'something merged after ' + payload.headShort + ' and is not shown. Regenerate the changelog.';
+      }
+    }
+    stand.appendChild(box);
+
+    // --- filters ---
+    var hidden = hiddenKinds();
+    var filters = document.getElementById('filters');
+    kinds.forEach(function (k) {
+      var n = payload.counts.byKind[k.id] || 0;
+      var b = el('button', null, k.label + ' · ' + n);
+      b.setAttribute('aria-pressed', hidden[k.id] ? 'false' : 'true');
+      b.addEventListener('click', function () {
+        hidden[k.id] = !hidden[k.id];
+        b.setAttribute('aria-pressed', hidden[k.id] ? 'false' : 'true');
+        writeHidden(hidden);
+        paint();
+      });
+      filters.appendChild(b);
+    });
+
+    var list = document.getElementById('list');
+
+    function paint() {
+      list.textContent = '';
+      var shown = payload.entries.filter(function (e) { return !hidden[e.kind]; });
+      if (!shown.length) {
+        list.appendChild(el('p', 'empty', 'Every kind is hidden. Turn one back on above.'));
+        return;
+      }
+      byMonth(shown).forEach(function (group) {
+        list.appendChild(el('h2', 'month', monthLabel(group.key)));
+        group.entries.forEach(function (e) { list.appendChild(entryNode(e, labels, payload.prBase)); });
+      });
+    }
+
+    paint();
+    renderPeriods(payload);
+  }
+
+  function entryNode(e, labels, prBase) {
+    var box = el('div', 'entry');
+    var line = el('div', 'line');
+    line.appendChild(el('span', 'date', dayLabel(e.date)));
+    line.appendChild(el('span', 'subject', e.subject));
+    line.appendChild(el('span', 'chip', labels[e.kind] || e.kind));
+    if (e.pr != null) {
+      if (prBase) {
+        var a = el('a', 'pr', '#' + e.pr);
+        a.href = prBase + '/' + e.pr;
+        a.rel = 'noreferrer';
+        line.appendChild(a);
+      } else {
+        // No recognisable remote: the number renders as text rather than as a
+        // link to a repository that may not be this one.
+        line.appendChild(el('span', 'pr chip', '#' + e.pr));
+      }
+    }
+    line.appendChild(el('span', 'stat', e.files + 'f +' + e.insertions + '/−' + e.deletions));
+    box.appendChild(line);
+
+    if (e.steps && e.steps.length) {
+      var d = el('details', 'steps');
+      d.appendChild(el('summary', null, e.steps.length + ' commits squashed into this'));
+      var ul = el('ul');
+      e.steps.forEach(function (s) { ul.appendChild(el('li', null, s)); });
+      d.appendChild(ul);
+      box.appendChild(d);
+    }
+    if (e.areas && e.areas.length) {
+      box.appendChild(el('div', 'areas', e.areas.map(function (a) {
+        return a.path + ' ×' + a.files;
+      }).join('  ·  ')));
+    }
+    return box;
+  }
+
+  /**
+   * The dispatcher's periods, labelled for what they are.
+   *
+   * `estimate_h` is attention time inferred from typed messages in local
+   * transcripts. `confirmed_h` is what the user said when asked. NEITHER IS
+   * BILLABLE TIME, and this page says so on screen rather than in a comment,
+   * because a column of hours beside a changelog will be read as an invoice by
+   * the next person who opens it.
+   */
+  function renderPeriods(payload) {
+    var periods = payload.periods || [];
+    if (!periods.length) return;
+    var host = document.getElementById('periods');
+    var box = el('div', 'periods');
+    box.appendChild(el('strong', null, 'Time on this repo'));
+    box.appendChild(el('div', null,
+      'Attention estimates from local session transcripts, and the hours the operator '
+      + 'confirmed when asked. These are not billable hours and were never recorded as such.'));
+    var t = el('table');
+    var head = el('tr');
+    ['Period', 'Estimate', 'Confirmed', 'Note'].forEach(function (h) {
+      head.appendChild(el('th', null, h));
+    });
+    t.appendChild(head);
+    periods.forEach(function (p) {
+      var tr = el('tr');
+      var span = Array.isArray(p.period) ? p.period.join(' → ') : String(p.period || '—');
+      tr.appendChild(el('td', null, span));
+      tr.appendChild(el('td', null, p.estimate_h != null ? p.estimate_h + ' h' : '—'));
+      tr.appendChild(el('td', null, p.confirmed_h != null ? p.confirmed_h + ' h' : '—'));
+      tr.appendChild(el('td', null, p.note || ''));
+      t.appendChild(tr);
+    });
+    box.appendChild(t);
+    host.appendChild(box);
+  }
+
+  fetch('./changelog.json', { cache: 'no-cache' })
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(render)
+    .catch(function (err) {
+      // An empty list is the failure this page exists to avoid, so a load
+      // failure says so loudly instead of rendering nothing and looking like a
+      // quiet quarter.
+      document.getElementById('sub').textContent =
+        'Could not load ./changelog.json (' + err.message + '). '
+        + 'This page renders a generated payload; it has no fallback and deliberately does not invent one.';
+    });
+})();
+</script>
+</body>
+</html>
