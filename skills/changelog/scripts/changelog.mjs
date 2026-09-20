@@ -446,11 +446,13 @@ async function fillPrBodies(entries, previous, slug) {
 
   const wanted = entries.filter((e) => e.pr != null);
   let fetched = 0;
+  let hits = 0;
   let warned = false;
 
   for (const e of wanted) {
     if (cached.has(e.pr)) {
       e.body = cached.get(e.pr);
+      hits += 1;
       continue;
     }
     if (warned) continue; // one failure means gh is unusable; do not retry 300 times
@@ -467,11 +469,14 @@ async function fillPrBodies(entries, previous, slug) {
       warned = true;
       console.warn(
         `changelog: --pr-bodies could not reach \`gh\` (${short(err)}); ` +
-          `${wanted.length - fetched} PR bodies left null. The list is complete regardless.`
+          `${wanted.length - fetched - hits} PR bodies left null. The list is complete regardless.`
       );
     }
   }
-  return { fetched, cached: wanted.length - fetched, warned };
+  // `missing` is reported separately from `cached` on purpose: a run that
+  // fetched nothing because gh was down must not read as a run that hit a warm
+  // cache, or the one line anybody looks at hides the failure.
+  return { fetched, cached: hits, missing: wanted.length - fetched - hits, warned };
 }
 
 function short(err) {
@@ -596,17 +601,19 @@ function check({ root, ref, out, classify }) {
 
   if (missing.length) {
     console.error(
-      `changelog --check: ${missing.length} entries name commits this checkout does not have:`
+      `changelog --check: ${missing.length} ${plural(missing.length, 'entry names', 'entries name')} ` +
+        'a commit this checkout does not have:'
     );
     for (const e of missing.slice(0, 10)) console.error(`  ${e.short}  ${e.subject}`);
     return 1;
   }
 
   if (drift.length) {
+    const one = drift.length === 1;
     console.error(
-      `changelog --check: ${drift.length} committed ${plural(drift.length, 'entry', 'entries')} ` +
-        'do not match what their own commit derives to. Either an entry was edited by hand, ' +
-        'or the classifier moved:'
+      `changelog --check: ${drift.length} committed ` +
+        `${one ? 'entry does not match what its' : 'entries do not match what their'} own ` +
+        'commit derives to. Either an entry was edited by hand, or the classifier moved:'
     );
     for (const d of drift) {
       console.error(`  ${d.entry.short}  ${d.entry.subject}`);
@@ -685,7 +692,10 @@ async function main() {
 
   if (opts.prBodies) {
     const res = await fillPrBodies(payload.entries, previous, repoSlug(root));
-    console.log(`  pr bodies      ${res.fetched} fetched, ${res.cached} from cache`);
+    console.log(
+      `  pr bodies      ${res.fetched} fetched, ${res.cached} from cache` +
+        (res.missing ? `, ${res.missing} unavailable` : '')
+    );
   } else if (previous) {
     // Bodies already paid for stay paid for; a run without --pr-bodies must not
     // silently delete prose the last run fetched.
