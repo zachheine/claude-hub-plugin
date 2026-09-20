@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git:*)", "Bash(gh:*)",
+      "Bash(node:*)", "Bash(npm:*)", "Bash(npx:*)", "Bash(python3:*)",
+      "Bash(claude plugin:*)",
+      "Bash(ls:*)", "Bash(cat:*)", "Bash(head:*)", "Bash(tail:*)", "Bash(wc:*)",
+      "Bash(grep:*)", "Bash(rg:*)", "Bash(find:*)", "Bash(diff:*)", "Bash(jq:*)",
+      "Bash(sed:*)", "Bash(awk:*)", "Bash(sort:*)", "Bash(uniq:*)", "Bash(cut:*)",
+      "Bash(mkdir:*)", "Bash(cp:*)", "Bash(mv:*)", "Bash(chmod:*)", "Bash(echo:*)"
+    ]
+  }
+}
