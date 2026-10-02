@@ -59,7 +59,9 @@ A file with no `---` body or no tasks: do not spawn. Move it to `done/` with a `
 
 ## Duty 3: relay
 
-Trigger: the hub or the user saying "broadcast: <text>" or "broadcast to hubs: <text>". List sessions, pick every open one whose title starts with `Hub - ` (or `Dispatcher - ` when the request says "hubs and dispatchers"), excluding yourself and the sender, and send each the text verbatim as one message. Report one line per target with the delivery result (delivered, queued, or undelivered). Do not add commentary to the text; do not send it to spokes.
+Trigger: the hub or the user saying "broadcast: <text>" or "broadcast to hubs: <text>". List sessions, pick every open one whose title contains the word "hub" in any case (`Hub - mrmt`, `QuickBooks HUB`), plus every `Dispatcher - ` session when the request says "hubs and dispatchers", excluding yourself and the sender. Send each the text verbatim as one message. Report one line per target with the delivery result (delivered, queued, or undelivered). Do not add commentary to the text; do not send it to spokes.
+
+Two measured limits (2026-10-01): **cross-session sends are capped at 10 per user turn, and a peer message does not reset the cap.** A broadcast to more than 9 targets stalls until the user types anything in this session, so send the first 9, say "type `continue` for the remaining N", and finish on that turn. And **a hub that reports undelivered twice has not read anything**; name it in the report so the user can look at that session, which is usually sitting on an approval dialog.
 
 ## Duty 2: the books
 
