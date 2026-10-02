@@ -108,7 +108,14 @@ A fresh worktree has the tracked files and nothing else. These failures are sile
 - **Ports.** State the repo's port etiquette: who owns the default port, and that a spoke picks a free port (`lsof -nP -iTCP -sTCP:LISTEN`) if its assigned one is taken. **Never kill a PID for holding "your" port.** It is usually a live sibling spoke's stack, and a framework dev server and its proxy are a pair, so one kill takes down another session's whole environment. Kill only a PID traceable to a command launched in this session.
 - **Commit early and often.** An uncommitted worktree is unrecoverable if the session dies or the worktree is cleaned up; git has nothing to restore when the branch never moved off main.
 - **Scratch files** go in the session scratchpad directory, not `/tmp` (not always writable) and not the repo.
-- **Automate the setup instead of re-briefing it.** Two committed mechanisms make every future worktree start ready: a `.worktreeinclude` file at the repo root (gitignore syntax) lists gitignored files to copy into new worktrees, such as `.env.local`, `.netlify/state.json`, or a local data directory; and a `WorktreeCreate` hook in `.claude/settings.json` runs a command at creation, such as `npm ci`. Set these up once, early, and the environment section of each brief shrinks to a line. Never list a secret-bearing file in `.worktreeinclude` on a shared repo without deciding that deliberately.
+- **Automate the setup instead of re-briefing it.** Two committed mechanisms make every future worktree start ready: a `.worktreeinclude` file at the repo root (gitignore syntax) lists gitignored files to copy into new worktrees, such as `.env.local`, `.netlify/state.json`, or a local data directory; and a `SessionStart` hook in `.claude/settings.json` with matcher `startup` installs dependencies when they are missing:
+
+  ```json
+  { "hooks": { "SessionStart": [ { "matcher": "startup", "hooks": [
+    { "type": "command", "command": "[ -d node_modules ] || npm ci --no-audit --no-fund", "timeout": 300 } ] } ] } }
+  ```
+
+  **Never put setup in a `WorktreeCreate` hook.** That event replaces git's worktree creation and reads the hook's stdout as the new worktree path, so a setup command there breaks every chip spawn ("Couldn't start the suggested task"). Measured on point-cloud 2026-09-19; the SessionStart form has run clean on every spoke since. Set these up once, early, and the environment section of each brief shrinks to a line. Never list a secret-bearing file in `.worktreeinclude` on a shared repo without deciding that deliberately.
 
 ## Rules that prevent the usual failures
 
@@ -119,6 +126,7 @@ A fresh worktree has the tracked files and nothing else. These failures are sile
 - Answer "where are we?" from ground truth (open PRs, CI, branches), never from your last known state.
 - Monitoring: spokes are independent peer sessions and you get no automatic completion signal. The durable signal is PR and branch state; check it on demand or offer the user a polling loop. Where cross-session messaging is available (`ListAgents` lists local sessions, `SendMessage` reaches one by name), tell each spoke in its brief to message the hub when its PR is up or it is blocked, and use it yourself to warn a spoke about a fence change. A message is a convenience, not the record; the PR is. Relay spoke results to the user; their final reports are not shown to them. To reach every hub at once (a skill reload after the plugin changes, a fleet-wide instruction), tell your dispatcher "broadcast to hubs: <text>"; it delivers and reports per target.
 - When CI is red on every PR at once, suspect a shared or pre-existing cause on the default branch before blaming any spoke's diff.
+- **A spoke whose `cwd` is another repo belongs to that repo's hub** for every shared sequence and deploy-time action. Before queuing one, message that hub and ask it to allocate migration numbers and ports; never read a range off the filesystem yourself, because a range reserved from a stale view collides silently until CI rejects it. Name that hub in the brief as the merge authority.
 - When two spokes turn out to have copied or duplicated work (one needed code that existed only uncommitted in another's worktree), record it on the board and reconcile at merge; whichever lands second reconciles against the first.
 - **Screenshots in PR bodies on a private repo.** Raw GitHub URLs render as broken images (the image proxy strips auth). Link to the file's blob page instead, or drag-drop in the browser so GitHub hosts it. Send the images to the user directly too.
 
