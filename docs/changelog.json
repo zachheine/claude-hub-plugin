@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "86277d2d85671ab8bf441fe7e5e4f920510f76bd",
-  "headShort": "86277d2d",
-  "headDate": "2026-10-01T22:13:38-07:00",
+  "head": "777ddf24e37820cbfdda6ebce9d0a976bb3fba81",
+  "headShort": "777ddf24",
+  "headDate": "2026-10-02T06:06:38-07:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,12 +25,12 @@
     }
   ],
   "counts": {
-    "total": 13,
+    "total": 15,
     "byKind": {
-      "skill": 11,
+      "skill": 12,
       "release": 1,
       "docs": 0,
-      "chore": 1
+      "chore": 2
     }
   },
   "periods": [
@@ -42,9 +42,86 @@
       "estimate_h": 0.9,
       "confirmed_h": 0.9,
       "note": "first books run; PR #1 changelog skill + release 2.1.0; user confirmed the estimate as-is"
+    },
+    {
+      "period": [
+        "2026-10-01",
+        "2026-10-02"
+      ],
+      "estimate_h": 0.4,
+      "confirmed_h": 0.4,
+      "note": "model handshake, 2.2.0 and 2.2.1 relays, self-changelog spoke; user confirmed the estimate as-is"
     }
   ],
   "entries": [
+    {
+      "sha": "777ddf24e37820cbfdda6ebce9d0a976bb3fba81",
+      "short": "777ddf24",
+      "date": "2026-10-02T06:06:38-07:00",
+      "subject": "chore(changelog): this repo's own derived changelog",
+      "pr": 2,
+      "type": "chore",
+      "scope": "changelog",
+      "steps": [
+        "chore(changelog): copy generator to scripts/changelog.mjs",
+        "chore(changelog): create changelog.config.mjs with skill/release/docs/chore kinds",
+        "chore(changelog): generate payload (13 entries: 11 skill, 1 release, 1 chore)",
+        "chore(changelog): add docs/index.html with custom title",
+        "chore(changelog): add CI gate workflow",
+        "chore(changelog): add CLAUDE.md with changelog generator command",
+        "chore(changelog): document changelog files in README Layout section"
+      ],
+      "files": 7,
+      "insertions": 1609,
+      "deletions": 0,
+      "areas": [
+        {
+          "path": "(root)",
+          "files": 3
+        },
+        {
+          "path": "docs",
+          "files": 2
+        },
+        {
+          "path": ".github/workflows",
+          "files": 1
+        },
+        {
+          "path": "scripts",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "a7a5a63b6f449f69af26413a5cfa4ab33f391b63",
+      "short": "a7a5a63b",
+      "date": "2026-10-02T06:04:54-07:00",
+      "subject": "Dispatcher relay: match any hub title, respect the 10-send cap, name silent hubs",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 4,
+      "deletions": 2,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "86277d2d85671ab8bf441fe7e5e4f920510f76bd",
       "short": "86277d2d",
