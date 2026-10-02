@@ -1,0 +1,424 @@
+{
+  "version": 1,
+  "ref": "origin/main",
+  "head": "86277d2d85671ab8bf441fe7e5e4f920510f76bd",
+  "headShort": "86277d2d",
+  "headDate": "2026-10-01T22:13:38-07:00",
+  "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
+  "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
+  "kinds": [
+    {
+      "id": "skill",
+      "label": "Skill"
+    },
+    {
+      "id": "release",
+      "label": "Release"
+    },
+    {
+      "id": "docs",
+      "label": "Docs"
+    },
+    {
+      "id": "chore",
+      "label": "Chore"
+    }
+  ],
+  "counts": {
+    "total": 13,
+    "byKind": {
+      "skill": 11,
+      "release": 1,
+      "docs": 0,
+      "chore": 1
+    }
+  },
+  "periods": [
+    {
+      "period": [
+        "2026-09-20",
+        "2026-09-20"
+      ],
+      "estimate_h": 0.9,
+      "confirmed_h": 0.9,
+      "note": "first books run; PR #1 changelog skill + release 2.1.0; user confirmed the estimate as-is"
+    }
+  ],
+  "entries": [
+    {
+      "sha": "86277d2d85671ab8bf441fe7e5e4f920510f76bd",
+      "short": "86277d2d",
+      "date": "2026-10-01T22:13:38-07:00",
+      "subject": "Hub: SessionStart hook for worktree setup, never WorktreeCreate; cross-repo spoke rule",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 10,
+      "deletions": 2,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "b455c398ac4f9f23243d981e3c643826bc093b8b",
+      "short": "b455c398",
+      "date": "2026-10-01T22:11:38-07:00",
+      "subject": "Dispatcher: per-spoke model handshake and hub broadcast relay",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 27,
+      "deletions": 5,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "a50af374d665efce24ed6ab6d92d8809a99f29d4",
+      "short": "a50af374",
+      "date": "2026-09-20T09:58:01-07:00",
+      "subject": "chore(release): 2.1.0 with the changelog skill",
+      "pr": null,
+      "type": "chore",
+      "scope": "release",
+      "steps": [],
+      "files": 2,
+      "insertions": 3,
+      "deletions": 3,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 2
+        }
+      ],
+      "kind": "release",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "0a2873c8df5776d27e2153cfb92c9e822d4d30f1",
+      "short": "0a2873c8",
+      "date": "2026-09-20T09:57:58-07:00",
+      "subject": "feat(changelog): skill and zero-dependency generator for a git-derived changelog",
+      "pr": 1,
+      "type": "feat",
+      "scope": "changelog",
+      "steps": [
+        "feat(changelog): zero-dependency git-derived changelog generator",
+        "feat(changelog): example classifier config and static reference page",
+        "feat(changelog): the skill — scaffold the pattern, and regenerate after merges",
+        "fix(changelog): report unavailable PR bodies separately from cache hits"
+      ],
+      "files": 5,
+      "insertions": 1396,
+      "deletions": 0,
+      "areas": [
+        {
+          "path": "skills/changelog",
+          "files": 4
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "d73509cdb5d8136c5672be78cb005c45f757a68c",
+      "short": "d73509cd",
+      "date": "2026-09-20T09:32:47-07:00",
+      "subject": "chore: committed spoke permissions (acceptEdits, broad command families)",
+      "pr": null,
+      "type": "chore",
+      "scope": null,
+      "steps": [],
+      "files": 1,
+      "insertions": 14,
+      "deletions": 0,
+      "areas": [
+        {
+          "path": ".claude",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "558a6a7b2767e9a039afa1751a2c09837451dc5e",
+      "short": "558a6a7b",
+      "date": "2026-09-20T09:01:33-07:00",
+      "subject": "Dispatcher keeps the books: cleanup, changelog, checkboxes, hours estimate",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 5,
+      "insertions": 154,
+      "deletions": 35,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "c4cdd38c69f1a92cb742d0c558a90101db5a795f",
+      "short": "c4cdd38c",
+      "date": "2026-09-14T08:20:22-07:00",
+      "subject": "Hub: an idle dispatcher is the ready state",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 2,
+      "deletions": 2,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "d03251a51e70bff5c144efcf441b17074d8ab601",
+      "short": "d03251a5",
+      "date": "2026-09-14T08:19:44-07:00",
+      "subject": "Hub sets the dispatcher's model itself after opening it",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 3,
+      "deletions": 3,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "51259cb47ce48187312450534ef0b097e73fc0d3",
+      "short": "51259cb4",
+      "date": "2026-09-11T21:53:46-07:00",
+      "subject": "Session message is the dispatcher trigger; go is the fallback",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 5,
+      "deletions": 5,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "44b8eb40801423552578ac311e54286e556270a2",
+      "short": "44b8eb40",
+      "date": "2026-09-11T21:24:12-07:00",
+      "subject": "Hub opens the dispatcher via chip; dispatcher self-titles and spawns only on go",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 14,
+      "deletions": 11,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "1e9df788a26debb1476184f303f8abd7606d9538",
+      "short": "1e9df788",
+      "date": "2026-09-11T21:16:00-07:00",
+      "subject": "Dispatcher: file-based queue; session messages are only a nudge",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 33,
+      "deletions": 19,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "60b3d7905974dc7b58b7a55efffa222ef967772f",
+      "short": "60b3d790",
+      "date": "2026-09-11T20:52:10-07:00",
+      "subject": "Add dispatch skill; route hub spawns through a model-pinned dispatcher",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 5,
+      "insertions": 89,
+      "deletions": 11,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 2
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "12b5597175e815000b1b044ddce4ef729737d00a",
+      "short": "12b55971",
+      "date": "2026-09-08T21:40:11-07:00",
+      "subject": "hub skill as a self-hosted Claude Code plugin",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 4,
+      "insertions": 172,
+      "deletions": 0,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 2
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    }
+  ]
+}
