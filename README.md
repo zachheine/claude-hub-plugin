@@ -30,4 +30,5 @@ skills/hub/SKILL.md               the hub skill
 skills/dispatch/SKILL.md          the dispatcher skill
 skills/dispatch/scripts/attention.py   attention-time estimate from local transcripts
 skills/changelog/SKILL.md         the changelog skill, its generator and a static page
+docs/changelog.json + docs/index.html   this repo's own derived changelog
 ```
