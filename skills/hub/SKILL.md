@@ -48,9 +48,12 @@ Two ways to use that:
   title: <imperative, under 60 characters>
   tldr: <one or two plain sentences for the chip card>
   cwd: <absolute path to the primary checkout>
+  model: <optional picker id>
   ---
   <the full brief>
   ```
+
+  `model` picks the spoke's model per brief; omit it for the dispatcher's own model (Opus). The dispatcher runs a two-turn handshake for any other model, so the spoke's first turn is a one-word "ready" and the brief arrives as a message. Choose by the work, not the habit: `claude-haiku-4-5-20251001` for mechanical spokes (copy, rename, regenerate, bump, format), `claude-sonnet-5` for ordinary features, Opus by default. Fable spokes are spawned directly from a Fable hub, because switching a spoke up to a dearer model prompts the user each time.
 
   Then send the dispatcher a one-line session message, "check the queue", by session id. The delivery result tells you what happened: "delivered" means it is spawning and you can tell the user the chips are appearing in Dispatcher - <repo>; "queued" means it will act when its current turn ends; "undelivered" means it is blocked, usually on an approval dialog from its first invocation, so tell the user to look at that session and type `go`. The file is the record either way; the message is the trigger. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
 
@@ -114,7 +117,7 @@ A fresh worktree has the tracked files and nothing else. These failures are sile
 - **Shared-checkout variant.** If sessions share one working directory instead of worktrees, nobody switches branches (it changes HEAD for every session) and commits are isolated with hunk-level staging. Prefer worktrees.
 - Small direct commits to main are fine for docs, CI unblocks, and mechanical fleet-wide fixes. Anything feature-shaped becomes a spoke.
 - Answer "where are we?" from ground truth (open PRs, CI, branches), never from your last known state.
-- Monitoring: spokes are independent peer sessions and you get no automatic completion signal. The durable signal is PR and branch state; check it on demand or offer the user a polling loop. Where cross-session messaging is available (`ListAgents` lists local sessions, `SendMessage` reaches one by name), tell each spoke in its brief to message the hub when its PR is up or it is blocked, and use it yourself to warn a spoke about a fence change. A message is a convenience, not the record; the PR is. Relay spoke results to the user; their final reports are not shown to them.
+- Monitoring: spokes are independent peer sessions and you get no automatic completion signal. The durable signal is PR and branch state; check it on demand or offer the user a polling loop. Where cross-session messaging is available (`ListAgents` lists local sessions, `SendMessage` reaches one by name), tell each spoke in its brief to message the hub when its PR is up or it is blocked, and use it yourself to warn a spoke about a fence change. A message is a convenience, not the record; the PR is. Relay spoke results to the user; their final reports are not shown to them. To reach every hub at once (a skill reload after the plugin changes, a fleet-wide instruction), tell your dispatcher "broadcast to hubs: <text>"; it delivers and reports per target.
 - When CI is red on every PR at once, suspect a shared or pre-existing cause on the default branch before blaming any spoke's diff.
 - When two spokes turn out to have copied or duplicated work (one needed code that existed only uncommitted in another's worktree), record it on the board and reconcile at merge; whichever lands second reconciles against the first.
 - **Screenshots in PR bodies on a private repo.** Raw GitHub URLs render as broken images (the image proxy strips auth). Link to the file's blob page instead, or drag-drop in the browser so GitHub hosts it. Send the images to the user directly too.
