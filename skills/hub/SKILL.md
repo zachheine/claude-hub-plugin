@@ -31,37 +31,52 @@ Verification effort should match the project phase, and the user sets the dial. 
 
 Regardless of dial: production data migrations, anything touching auth, and defects the user reports from real use get the heavy treatment.
 
-## Model: which model spokes run on
+## Models: hub, dispatcher, spokes
 
-**A spoke gets the model of whichever session calls the spawn-task tool, at click time.** Nothing in a settings file governs chip spawns; the `model` key in `.claude/settings.json` (alias or full id) was tested and does not apply to them. It matters only for sessions started from the terminal or opened fresh on the folder. Verified again 2026-09-09: a chip spawned from a Fable hub against a settings file saying Opus came back Fable.
+**The hub runs on Opus 5.5** (`claude-opus-5-5`). Its expensive work is briefs, review, and conflict resolution, and Opus 5.5 at high effort does that well; Fable costs two and a half times as much per token on every hub turn, most of which are reading state. Flip the hub's picker up to Fable for a session that earns it (architecture convergence, a tangled merge train, correctness-unforgiving work) and back afterward.
 
-Two ways to use that:
+**The dispatcher runs on Sonnet 5.5** (`claude-sonnet-5-5`). Its own duties are chores. It still spawns every spoke, and it switches each spoke to the model the hub names.
 
-- **Dispatcher (preferred when the hub runs a stronger model than the spokes should).** A standing second session on the spoke model, usually Opus, titled `Dispatcher - <repo>` and running the `dispatch` skill. It spawns every spoke (so spokes inherit its model) and keeps the books after merges (worktree cleanup, changelog, checkboxes, hours), so the hub's model is spent only on judgment.
+**Every spoke gets the model the hub names in its brief.** A chip starts on the model of the session that spawned it; the dispatcher then switches it with the set-model tool before the real work begins (the two-turn handshake in the `dispatch` skill). Switching to a dearer model asks the user once, in the dispatcher session, right where they click the chip; that is fine, the user clicks chips anyway. Nothing in a settings file governs chip spawns; the `model` key in `.claude/settings.json` was tested and applies only to sessions started from the terminal or opened fresh on the folder.
 
-  **On invocation, find it** with the session-management list tool: title starting `Dispatcher -`, `cwd` in this repo (primary checkout or a worktree under it). Report whether one is open and what model it shows. An open dispatcher is idle between requests (the session list shows it not running); that is its ready state, not a problem. Only an archived or missing dispatcher counts as absent. **If none is open, spawn one:** a chip titled `Open dispatcher for <repo>`, `cwd` the primary checkout, with the prompt "Invoke the dispatch skill (/dispatch) and follow it. Do nothing else." Tell the user to click it. When the app reports that the task was started, find the new session by title in the session list and call the session-management set-model tool on it with the spoke model (`claude-opus-5`). That session was started from this hub's suggestion and the model is cheaper, so no approval prompt is expected; if one appears, the user answers it. Its invocation turn runs on the hub's model, every turn after that on Opus, and nobody touches a picker. Confirm with a session read that its model changed. The dispatcher lives in the worktree the chip creates; it never commits, and the hub's worktree cleanup must leave it alone while it is running.
+### Spoke sizing
 
-  To spawn through it, write one file per spoke to `~/.claude/dispatch/<repo>/queue/<timestamp>-<slug>.md` (`<repo>` is the basename of the primary checkout), containing exactly:
+Size each work item before writing its brief, and put the result on the `model:` line. The sizing is a judgment the hub owes the spoke; it is also where most of the token spend is decided.
+
+| Tier | Model | Fits |
+|---|---|---|
+| Mechanical | `claude-haiku-4-5-20251001` | copy, rename, regenerate, bump, format, apply a pattern the brief shows |
+| Ordinary | `claude-sonnet-5-5` | a feature or fix with named files and a clear acceptance check |
+| Meaty | `claude-opus-5-5` | cross-cutting features, new subsystems, anything needing design inside the spoke |
+| Judgment | `claude-fable-5-1` | rare: the decisions cannot be made in the brief and must be made in the code |
+
+### Context budget: what spokes actually spend tokens on
+
+Measured on 191 sessions over two weeks (mrmt-platform, 2026-10-03): **reading code was 60% of everything tools put into spoke context; test and build output was 7%.** Spokes burn tokens orienting themselves, not running tests. Three levers, in order of effect:
+
+1. **Name the files.** A brief that says "the change is in these three files; the pattern to copy is at this path, lines N to M" costs the spoke a tenth of the reading that "add feature X" does. The hub explores once per feature; a spoke told nothing explores per attempt, on a dearer model. Spend the hub's effort here.
+2. **Delegate exploration and tests to cheap subagents inside the spoke.** The brief tells the spoke to use the Explore agent (on Haiku) for any sweep wider than the named files, and to run test suites through a subagent that returns failures only. Raw file contents and raw test logs then never enter the spoke's context. This is the brain-and-brawn split, inside one session: the spoke decides, subagents read and run. A second session for execution is not worth its plumbing; one branch cannot be checked out in two worktrees.
+3. **Trim command output.** Spokes tail, grep, or count instead of dumping. A 60 KB file read is a 15,000-token turn that is re-sent on every subsequent turn.
+
+Spawn through the dispatcher by queuing a file per spoke at `~/.claude/dispatch/<repo>/queue/<timestamp>-<slug>.md`:
 
   ```
   SPAWN
   title: <imperative, under 60 characters>
   tldr: <one or two plain sentences for the chip card>
   cwd: <absolute path to the primary checkout>
-  model: <optional picker id>
+  model: <picker id from the sizing table; always present>
   ---
   <the full brief>
   ```
 
-  `model` picks the spoke's model per brief; omit it for the dispatcher's own model (Opus). The dispatcher runs a two-turn handshake for any other model, so the spoke's first turn is a one-word "ready" and the brief arrives as a message. Choose by the work, not the habit: `claude-haiku-4-5-20251001` for mechanical spokes (copy, rename, regenerate, bump, format), `claude-sonnet-5` for ordinary features, Opus by default. Fable spokes are spawned directly from a Fable hub, because switching a spoke up to a dearer model prompts the user each time.
+Then send the dispatcher a one-line session message, "check the queue", by session id. "Delivered" means it is spawning; "queued" means it will act when its current turn ends; "undelivered" means it is blocked, usually on an approval dialog, so tell the user to look at that session and type `go`. The file is the record; the message is the trigger. When the dispatcher has spawned, it moves the file to `done/` with `task_id:` and `model_set:` lines; read that to record the chip on the board.
 
-  Then send the dispatcher a one-line session message, "check the queue", by session id. The delivery result tells you what happened: "delivered" means it is spawning and you can tell the user the chips are appearing in Dispatcher - <repo>; "queued" means it will act when its current turn ends; "undelivered" means it is blocked, usually on an approval dialog from its first invocation, so tell the user to look at that session and type `go`. The file is the record either way; the message is the trigger. When the dispatcher has spawned, it moves the file to `~/.claude/dispatch/<repo>/done/` with a `task_id:` line appended; read that to record the chip on the board.
+**On invocation, find the dispatcher** with the session-management list tool: title containing "Dispatcher" and `cwd` in this repo. An open dispatcher is idle between requests; that is its ready state. **If none is open, spawn one:** a chip titled `Open dispatcher for <repo>`, `cwd` the primary checkout, prompt "Invoke the dispatch skill (/dispatch) and follow it. Do nothing else." When the app reports the task started, find the new session by title and set its model to `claude-sonnet-5-5` with the set-model tool (a downgrade from the hub's model, so no prompt). Its worktree stays while it runs; the hub's cleanup leaves it alone.
 
-  Spawn directly from the hub only for a spoke that should inherit the hub's own model.
+**No dispatcher open and no time to open one:** the hub spawns directly and runs the handshake itself (bootstrap chip, "ready" comes back, set the model, send the brief). Spokes then start on the hub's model, so only downward switches are silent. Prefer the dispatcher; it keeps every "ready" and books exchange out of the hub's context.
 
-- **No dispatcher.** Run the hub on the model you want spokes to inherit, and flip the picker for the exception, then back. Do not run the hub on a stronger model expecting settings to protect the spokes; every chip silently inherits the expensive model.
-
-`get_session` reports a session's CURRENT model, not its spawn model, so it cannot audit this after a manual flip. The user's observation is the only ground truth.
+`get_session` reports a session's CURRENT model, not its spawn model. The user's observation is the only ground truth.
 
 ## Permissions: why spokes prompt, and what actually helps
 
@@ -71,15 +86,15 @@ Measured facts (they overturn a plausible earlier theory, so trust these over re
 2. **Exact-argument rules barely match anyway.** Local files grow to hundreds of rules pinned to full command strings (one measured file: 936 rules, 111 KB, 175 separate `node` entries) and the next command is still a miss.
 3. **Compound `&&` chains defeat prefix rules.** Rules match the whole command string, so `Bash(mkdir:*)`, `Bash(cp:*)` and `Bash(npm:*)` all fail against `mkdir -p x && cp a b && npm install`. This is the dominant cause of prompting even with a good allow-list, and no settings file fixes it. **Write spoke briefs with one command per line and tell spokes to run commands separately.**
 4. **`defaultMode: "bypassPermissions"` in the project's `.claude/settings.json` is not honored.** The value is in the schema, but project scope is gated; a checked-out file verbatim with bypass set still prompted. Do not put it there. It misleads anyone reading the file and would take effect for a collaborator whose own config honors it. Bypass also needs a one-time user acceptance dialog that a config file cannot fake.
+5. **A project-level `defaultMode` of any other value OVERRIDES the user's bypass.** Project scope beats user scope. If the user runs `bypassPermissions` in `~/.claude/settings.json`, a committed `"defaultMode": "acceptEdits"` quietly downgrades every session in that repo to "ask about commands", and the spokes prompt on every mechanical step. Found 2026-10-03 after this skill had recommended exactly that line. **Check the user's settings first; if they run bypass, the committed file carries the allow list and `additionalDirectories` and no `defaultMode` at all.**
 
 What works, in order of preference:
 
-- **Committed `.claude/settings.json` with broad command-family allow rules** and `acceptEdits`. Git checks it out into every worktree. Families, not invocations: `Bash(node:*)`, never `Bash(node scripts/thing.mjs --flag)`. Adjust the list to the repo's toolchain.
+- **Committed `.claude/settings.json` with broad command-family allow rules**, and `acceptEdits` only when the user does NOT run bypass at user scope (fact 5). Git checks it out into every worktree. Families, not invocations: `Bash(node:*)`, never `Bash(node scripts/thing.mjs --flag)`. Adjust the list to the repo's toolchain.
 
   ```json
   {
     "permissions": {
-      "defaultMode": "acceptEdits",
       "additionalDirectories": ["/absolute/path/to/inputs/outside/the/repo"],
       "allow": [
         "Bash(git:*)", "Bash(gh:*)",
@@ -141,6 +156,7 @@ Prepend this preamble (filled in) to every spoke brief:
 > **Do not touch:** <files owned by parallel spokes, and shared infra the hub owns>
 > **Reserved for you:** <migration numbers / ports / other shared-sequence allocations>
 > **Environment:** <install command; where env files live and how to link them; dev server command run from THIS worktree on port <N>; how to confirm the served code is yours; inputs outside the repo and their absolute paths>
+> **Context budget:** The files you need are named above; read those. For any wider sweep use the Explore agent and work from its digest. Run test suites and builds through a subagent that returns failures and the final counts only; never paste raw logs into this session. Tail, grep, or count command output instead of dumping it.
 > **Tasks:** <numbered, concrete, in order>
 > **Verify before the PR:** <heavy dial: type-check/lint/test commands with expected results, manual steps, known flaky tests and the retry policy. Light dial: the deliverable (usually a screenshot) plus an honest "what I did and didn't check.">
 > **When done or blocked:** <if cross-session messaging is available: find the hub with `ListAgents` and send it a one-paragraph status with `SendMessage`; otherwise the PR is the signal>
