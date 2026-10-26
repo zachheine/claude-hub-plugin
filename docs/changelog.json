@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "777ddf24e37820cbfdda6ebce9d0a976bb3fba81",
-  "headShort": "777ddf24",
-  "headDate": "2026-10-02T06:06:38-07:00",
+  "head": "41a0a0beb81e05284c72512a21526c5ecc63d1b6",
+  "headShort": "41a0a0be",
+  "headDate": "2026-10-25T21:04:27-07:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,12 +25,12 @@
     }
   ],
   "counts": {
-    "total": 15,
+    "total": 27,
     "byKind": {
-      "skill": 12,
-      "release": 1,
+      "skill": 22,
+      "release": 2,
       "docs": 0,
-      "chore": 2
+      "chore": 3
     }
   },
   "periods": [
@@ -54,6 +54,350 @@
     }
   ],
   "entries": [
+    {
+      "sha": "41a0a0beb81e05284c72512a21526c5ecc63d1b6",
+      "short": "41a0a0be",
+      "date": "2026-10-25T21:04:27-07:00",
+      "subject": "3.4: field feedback from the superstudio hub",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 19,
+      "deletions": 3,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "8b537ca79cc0f997e39835d3351226413fefa59c",
+      "short": "8b537ca7",
+      "date": "2026-10-22T19:19:20-07:00",
+      "subject": "Dispatcher: effort and permission-mode alignment in the handshake; unpushed-commit check; quote hook path",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 8,
+      "deletions": 6,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "hooks",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "07bf235464e77fb0d87bed8e41e8798d989bde74",
+      "short": "07bf2354",
+      "date": "2026-10-22T19:18:45-07:00",
+      "subject": "3.3: Claude Code 2.1.221-2.1.301 review",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 1,
+      "insertions": 14,
+      "deletions": 11,
+      "areas": [
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "09f4dbd51609be5543e3534b0214aba06ff07ad5",
+      "short": "09f4dbd5",
+      "date": "2026-10-04T00:07:03-07:00",
+      "subject": "Hours report: waking days (04:00 to 04:00), --completed for the morning run",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 36,
+      "deletions": 12,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "97b38851dcddd7b4154b574fb5dea0ae3aebc790",
+      "short": "97b38851",
+      "date": "2026-10-03T22:00:08-07:00",
+      "subject": "3.2: quiet hours, daily cross-repo hours report, one-by-one skill",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 6,
+      "insertions": 157,
+      "deletions": 4,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        },
+        {
+          "path": "skills/one-by-one",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "36f2f562f4de5e359fa7b4c6dd8fe1e0516b0851",
+      "short": "36f2f562",
+      "date": "2026-10-03T21:40:56-07:00",
+      "subject": "Books count instead of clean; cleanup only on an explicit 'clean up now'; skip re-tasked sessions",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 3,
+      "deletions": 3,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "29b4f04cec4d16fa1c325ccf2486358d6f4299a8",
+      "short": "29b4f04c",
+      "date": "2026-10-03T15:39:22-07:00",
+      "subject": "3.1: field feedback from Hub - mrmt-platform",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 8,
+      "deletions": 8,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "079419baeb11478440f4b9578d20b7a086c762a3",
+      "short": "079419ba",
+      "date": "2026-10-03T08:16:55-07:00",
+      "subject": "Dispatcher skill: Sonnet 5.5, spokes get the model the brief names",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 9,
+      "deletions": 9,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "06f6cfb1e810338d54a673c66bd328c81a9d1ebb",
+      "short": "06f6cfb1",
+      "date": "2026-10-03T08:16:00-07:00",
+      "subject": "3.0: Opus hub, Sonnet dispatcher, spoke sizing and context budgets, no project-level defaultMode",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 4,
+      "insertions": 60,
+      "deletions": 25,
+      "areas": [
+        {
+          "path": ".claude",
+          "files": 1
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "84699ed71d77cfdbb98d7c4110c2a4b53447997a",
+      "short": "84699ed7",
+      "date": "2026-10-02T06:20:15-07:00",
+      "subject": "Ship a UserPromptSubmit hook that notices skill changes, replacing broadcast reloads",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 4,
+      "insertions": 75,
+      "deletions": 1,
+      "areas": [
+        {
+          "path": "hooks",
+          "files": 2
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        }
+      ],
+      "kind": "release",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "6b91e57291bd519991f3ebf3bbd42d97ea87f16e",
+      "short": "6b91e572",
+      "date": "2026-10-02T06:10:47-07:00",
+      "subject": "Dispatcher books: settle hours before regenerating the changelog",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 4,
+      "deletions": 4,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "5f1b1f08edd2e8edc6258101d6fe54a2282d529a",
+      "short": "5f1b1f08",
+      "date": "2026-10-02T06:10:04-07:00",
+      "subject": "chore(changelog): regenerate after a7a5a63 777ddf2",
+      "pr": null,
+      "type": "chore",
+      "scope": "changelog",
+      "steps": [],
+      "files": 1,
+      "insertions": 83,
+      "deletions": 6,
+      "areas": [
+        {
+          "path": "docs",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "777ddf24e37820cbfdda6ebce9d0a976bb3fba81",
       "short": "777ddf24",
