@@ -53,19 +53,25 @@ def events(repo: str, since: datetime):
                         continue
                     yield t, rec.get('gitBranch') or '?', sid
 
-def union_minutes(times, window):
-    """Minutes covered by [t-w, t+w] windows, merged."""
+def union_spans(times, window):
+    """[t-w, t+w] windows merged into sorted, non-overlapping (start, end) pairs.
+    Spans that touch (s == previous end) are merged."""
     if not times:
-        return 0.0
+        return []
     w = timedelta(minutes=window)
     spans = sorted((t - w, t + w) for t in times)
-    total = timedelta(); cur_s, cur_e = spans[0]
+    out = []; cur_s, cur_e = spans[0]
     for s, e in spans[1:]:
         if s <= cur_e:
             cur_e = max(cur_e, e)
         else:
-            total += cur_e - cur_s; cur_s, cur_e = s, e
-    total += cur_e - cur_s
+            out.append((cur_s, cur_e)); cur_s, cur_e = s, e
+    out.append((cur_s, cur_e))
+    return out
+
+def union_minutes(times, window):
+    """Minutes covered by [t-w, t+w] windows, merged."""
+    total = sum((e - s for s, e in union_spans(times, window)), timedelta())
     return total.total_seconds() / 60
 
 def main():
