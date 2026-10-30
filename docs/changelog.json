@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "41a0a0beb81e05284c72512a21526c5ecc63d1b6",
-  "headShort": "41a0a0be",
-  "headDate": "2026-10-25T21:04:27-07:00",
+  "head": "e3947c909afbf19ebcdac6352642fb6962167cc1",
+  "headShort": "e3947c90",
+  "headDate": "2026-10-30T06:07:19-07:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,12 +25,12 @@
     }
   ],
   "counts": {
-    "total": 27,
+    "total": 29,
     "byKind": {
-      "skill": 22,
+      "skill": 23,
       "release": 2,
       "docs": 0,
-      "chore": 3
+      "chore": 4
     }
   },
   "periods": [
@@ -54,6 +54,54 @@
     }
   ],
   "entries": [
+    {
+      "sha": "e3947c909afbf19ebcdac6352642fb6962167cc1",
+      "short": "e3947c90",
+      "date": "2026-10-30T06:07:19-07:00",
+      "subject": "feat(dispatch): post the daily hours report to Superstudio's time-signals ingest (v1)",
+      "pr": 3,
+      "type": "feat",
+      "scope": "dispatch",
+      "steps": [],
+      "files": 5,
+      "insertions": 746,
+      "deletions": 20,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 4
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "c89dbe33165b60bb202c1a0740b72f71666c3f6d",
+      "short": "c89dbe33",
+      "date": "2026-10-25T21:04:29-07:00",
+      "subject": "chore(changelog): regenerate after 3.4",
+      "pr": null,
+      "type": "chore",
+      "scope": "changelog",
+      "steps": [],
+      "files": 1,
+      "insertions": 351,
+      "deletions": 7,
+      "areas": [
+        {
+          "path": "docs",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "41a0a0beb81e05284c72512a21526c5ecc63d1b6",
       "short": "41a0a0be",
