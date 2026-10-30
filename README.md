@@ -34,7 +34,7 @@ Skill updates do not reach a session that already loaded the skill. Rather than 
 skills/hub/SKILL.md               the hub skill
 skills/dispatch/SKILL.md          the dispatcher skill
 skills/dispatch/scripts/attention.py   attention-time estimate from local transcripts
-skills/dispatch/scripts/hours-report.py daily cross-repo hours report and confirmation
+skills/dispatch/scripts/hours-report.py daily cross-repo hours report and confirmation, posted to Superstudio when `~/.claude/dispatch/ingest.token` exists
 skills/one-by-one/SKILL.md        ask questions one at a time
 skills/changelog/SKILL.md         the changelog skill, its generator and a static page
 docs/changelog.json + docs/index.html   this repo's own derived changelog
