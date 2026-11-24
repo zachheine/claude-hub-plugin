@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "a8fe4bebcea2f584757e37c0e93896cd662539b8",
-  "headShort": "a8fe4beb",
-  "headDate": "2026-11-24T23:11:52+09:00",
+  "head": "845c85f9c84dec16c874506f3b3f538b5b0bea58",
+  "headShort": "845c85f9",
+  "headDate": "2026-11-24T23:15:42+09:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,12 +25,12 @@
     }
   ],
   "counts": {
-    "total": 31,
+    "total": 34,
     "byKind": {
-      "skill": 24,
+      "skill": 26,
       "release": 3,
       "docs": 0,
-      "chore": 4
+      "chore": 5
     }
   },
   "periods": [
@@ -63,6 +63,80 @@
     }
   ],
   "entries": [
+    {
+      "sha": "845c85f9c84dec16c874506f3b3f538b5b0bea58",
+      "short": "845c85f9",
+      "date": "2026-11-24T23:15:42+09:00",
+      "subject": "3.6.1: first live wrap-up measured; reuse-pool worktrees are not stragglers; gh merge hang",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 4,
+      "deletions": 4,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "380998c7d7e868930d9eaffaccb08d41a1f02c8d",
+      "short": "380998c7",
+      "date": "2026-11-24T06:14:34-08:00",
+      "subject": "docs: wrap-up for #3",
+      "pr": 4,
+      "type": "docs",
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 8,
+      "deletions": 0,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "6fcb85e198b015da340ff631c0c398a143ceafeb",
+      "short": "6fcb85e1",
+      "date": "2026-11-24T23:11:56+09:00",
+      "subject": "chore(changelog): regenerate after 3.6",
+      "pr": null,
+      "type": "chore",
+      "scope": "changelog",
+      "steps": [],
+      "files": 1,
+      "insertions": 71,
+      "deletions": 6,
+      "areas": [
+        {
+          "path": "docs",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "a8fe4bebcea2f584757e37c0e93896cd662539b8",
       "short": "a8fe4beb",
