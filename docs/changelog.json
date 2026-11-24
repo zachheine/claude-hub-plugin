@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "e3947c909afbf19ebcdac6352642fb6962167cc1",
-  "headShort": "e3947c90",
-  "headDate": "2026-10-30T06:07:19-07:00",
+  "head": "a8fe4bebcea2f584757e37c0e93896cd662539b8",
+  "headShort": "a8fe4beb",
+  "headDate": "2026-11-24T23:11:52+09:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,10 +25,10 @@
     }
   ],
   "counts": {
-    "total": 29,
+    "total": 31,
     "byKind": {
-      "skill": 23,
-      "release": 2,
+      "skill": 24,
+      "release": 3,
       "docs": 0,
       "chore": 4
     }
@@ -51,9 +51,74 @@
       "estimate_h": 0.4,
       "confirmed_h": 0.4,
       "note": "model handshake, 2.2.0 and 2.2.1 relays, self-changelog spoke; user confirmed the estimate as-is"
+    },
+    {
+      "period": [
+        "2026-10-03",
+        "2026-10-30"
+      ],
+      "estimate_h": 2.8,
+      "confirmed_h": null,
+      "note": "estimate, unconfirmed; includes 0.3 h dated 2026-10-02 that may overlap the previous period"
     }
   ],
   "entries": [
+    {
+      "sha": "a8fe4bebcea2f584757e37c0e93896cd662539b8",
+      "short": "a8fe4beb",
+      "date": "2026-11-24T23:11:52+09:00",
+      "subject": "3.6: spokes retire themselves after merge (exit docs pass, then archive)",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 3,
+      "insertions": 8,
+      "deletions": 5,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 1
+        },
+        {
+          "path": "skills/hub",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "6caf0d0af88ec2c8f4a5d2cced1bd2c2f9970e74",
+      "short": "6caf0d0a",
+      "date": "2026-10-30T06:26:31-07:00",
+      "subject": "3.5: hours report posts to Superstudio's time-signals ingest (v1)",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 55,
+      "deletions": 7,
+      "areas": [
+        {
+          "path": ".claude-plugin",
+          "files": 1
+        },
+        {
+          "path": "docs",
+          "files": 1
+        }
+      ],
+      "kind": "release",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "e3947c909afbf19ebcdac6352642fb6962167cc1",
       "short": "e3947c90",
