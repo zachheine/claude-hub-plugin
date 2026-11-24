@@ -23,6 +23,12 @@ posted and nothing is printed. Titles, branch names and message text are never s
   --post-day DATE    post that waking day only, no report, no catch-up
   --ingest-url URL   --tenant SLUG   override the module defaults
 
+The server fixes the waking day at 04:00 to 04:00, so a --day-start other than 04:00 fails
+payload validation and nothing is posted (the report itself is unaffected). Catch-up
+treats a day as stale when any repo's hours.jsonl holding a confirmation for it was
+modified after the day's last 200 in ~/.claude/dispatch/ingest-posted.jsonl, because
+those lines carry no timestamp; the extra re-posts are harmless.
+
 A waking day D runs from D at --day-start (default 04:00) to D+1 at --day-start, so
 work at 1 a.m. belongs to the evening it continued from, not to a new date.
 --completed picks the most recently finished waking day (yesterday's date when run
