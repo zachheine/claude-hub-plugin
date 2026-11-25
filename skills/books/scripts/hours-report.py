@@ -208,6 +208,30 @@ def repo_slug(repo):
     m = re.search(r'github\.com[:/]([^/\s]+)/([^/\s]+?)(?:\.git)?/?$', url)
     return f"{m.group(1)}/{m.group(2)}" if m else None
 
+def ingest_key(repo):
+    """The row key Superstudio maps to a project: the repo name from the origin remote
+    (zachheine/point-cloud-viewer -> point-cloud-viewer), else the folder name when there
+    is no remote. Superstudio keys by remote name since 2026-11-25; local files
+    (hours.jsonl, confirmations) stay keyed by folder name."""
+    slug = repo_slug(repo)
+    if slug: return slug.split('/', 1)[1]
+    try:
+        url = subprocess.run(['git', '-C', repo, 'remote', 'get-url', 'origin'], capture_output=True, text=True, timeout=15).stdout.strip()
+    except Exception:
+        url = ''
+    m = re.search(r'([^/:\s]+?)(?:\.git)?/?$', url)
+    return m.group(1) if m else os.path.basename(os.path.normpath(repo))
+
+def ingest_keys(root, names):
+    """{folder name: row key}. If two folders share a remote name, the ones after the
+    first keep their folder name, so no two rows share a key."""
+    out, used = {}, set()
+    for name in names:
+        k = ingest_key(os.path.join(os.path.expanduser(root), name))
+        if k in used: k = name
+        out[name] = k; used.add(k)
+    return out
+
 _PRS = {}
 
 def authored_prs(repo):
@@ -256,15 +280,16 @@ def confirmed_field(conf):
     c = round(v, 2)
     return 0.01 if (v > 0 and c == 0) else c
 
-def build_payload(date_str, rows, tenant, tz, window, day_start='04:00', prs=None):
-    """The v1 body. rows are (name, estimate, confirmation); prs maps repo name to PR numbers."""
+def build_payload(date_str, rows, tenant, tz, window, day_start='04:00', prs=None, keys=None):
+    """The v1 body. rows are (folder name, estimate, confirmation); prs maps folder name to PR
+    numbers; keys maps folder name to the row key (default: the folder name)."""
     start, end, _ = day_bounds(date_str, tz, day_start)
-    tzi = tzinfo(tz); prs = prs or {}
+    tzi = tzinfo(tz); prs = prs or {}; keys = keys or {}
     out = []
     for name, est, conf in rows:
         spans = clip_spans(attention.union_spans(est['times'], window), start, end)
         out.append({
-            'key': name,
+            'key': keys.get(name, name),
             'estimate_h': hours_field(est['minutes'] / 60),
             'confirmed_h': confirmed_field(conf),
             'windows': [[s.astimezone(tzi).isoformat(timespec='seconds'), e.astimezone(tzi).isoformat(timespec='seconds')] for s, e in spans],
@@ -340,9 +365,10 @@ def prepare_payload(args, date_str, rows):
         rows = rows[:100]
     start, end, _ = day_bounds(date_str, args.tz, args.day_start)
     prs = {name: fetch_prs(os.path.join(os.path.expanduser(args.root), name), start, end) for name, _e, _c in rows}
+    keys = ingest_keys(args.root, [name for name, _e, _c in rows])
     w = args.window
     while True:
-        payload = build_payload(date_str, rows, args.tenant, args.tz, w, args.day_start, prs)
+        payload = build_payload(date_str, rows, args.tenant, args.tz, w, args.day_start, prs, keys)
         if not too_many_windows(payload) or w >= 240: break
         w *= 2
     if w != args.window and not too_many_windows(payload):

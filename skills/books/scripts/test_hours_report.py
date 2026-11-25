@@ -146,6 +146,23 @@ class Payload(Base):
             self.assertLessEqual(e1, s2)
         self.assertEqual(hr.validate_payload(hr.build_payload(DAY, [('repo-a', est(times), None)], 't', TZ, 5.0)), [])
 
+    def test_keys_use_remote_name_with_folder_fallback(self):
+        import subprocess
+        root = tempfile.mkdtemp()
+        def repo(name, url=None):
+            d = os.path.join(root, name); os.makedirs(d)
+            subprocess.run(['git', 'init', '-q', d], check=True)
+            if url: subprocess.run(['git', '-C', d, 'remote', 'add', 'origin', url], check=True)
+        repo('point-cloud', 'git@github.com:someone/supersite.git')
+        repo('twin', 'https://github.com/someone/supersite')
+        repo('630-w-blithedale')
+        repo('other-host', 'https://gitlab.example.com/team/thing.git')
+        keys = hr.ingest_keys(root, ['point-cloud', 'twin', '630-w-blithedale', 'other-host'])
+        self.assertEqual(keys, {'point-cloud': 'supersite', 'twin': 'twin', '630-w-blithedale': '630-w-blithedale', 'other-host': 'thing'})
+        p = hr.build_payload(DAY, [('point-cloud', est([]), None)], 't', TZ, 5.0, keys=keys)
+        self.assertEqual(p['rows'][0]['key'], 'supersite')
+        self.assertEqual(hr.build_payload(DAY, [('repo-a', est([]), None)], 't', TZ, 5.0)['rows'][0]['key'], 'repo-a')
+
     def test_confirmed_rounding(self):
         c = hr.confirmed_field
         self.assertIsNone(c(None))
