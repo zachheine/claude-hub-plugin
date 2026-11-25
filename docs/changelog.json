@@ -1,9 +1,9 @@
 {
   "version": 1,
   "ref": "origin/main",
-  "head": "845c85f9c84dec16c874506f3b3f538b5b0bea58",
-  "headShort": "845c85f9",
-  "headDate": "2026-11-24T23:15:42+09:00",
+  "head": "bb53289d84806ca7ee1b88cbafd4f39cb51e187b",
+  "headShort": "bb53289d",
+  "headDate": "2026-11-25T13:17:18+09:00",
   "generatedFrom": "https://github.com/zachheine/claude-hub-plugin.git",
   "prBase": "https://github.com/zachheine/claude-hub-plugin/pull",
   "kinds": [
@@ -25,12 +25,12 @@
     }
   ],
   "counts": {
-    "total": 34,
+    "total": 37,
     "byKind": {
-      "skill": 26,
+      "skill": 28,
       "release": 3,
       "docs": 0,
-      "chore": 5
+      "chore": 6
     }
   },
   "periods": [
@@ -63,6 +63,88 @@
     }
   ],
   "entries": [
+    {
+      "sha": "bb53289d84806ca7ee1b88cbafd4f39cb51e187b",
+      "short": "bb53289d",
+      "date": "2026-11-25T13:17:18+09:00",
+      "subject": "4.0: hubs spawn with start-session; dispatcher retired; books and hub-handoff skills",
+      "pr": null,
+      "type": null,
+      "scope": null,
+      "steps": [],
+      "files": 13,
+      "insertions": 710,
+      "deletions": 662,
+      "areas": [
+        {
+          "path": "skills/books",
+          "files": 4
+        },
+        {
+          "path": ".claude-plugin",
+          "files": 2
+        },
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        },
+        {
+          "path": "(root)",
+          "files": 1
+        },
+        {
+          "path": "hooks",
+          "files": 1
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "489e475d8ce9343f512645070236e67c1f5521bb",
+      "short": "489e475d",
+      "date": "2026-11-24T20:12:11-08:00",
+      "subject": "hours: timestamp confirmations; catch-up uses confirmed_at",
+      "pr": 5,
+      "type": "hours",
+      "scope": null,
+      "steps": [],
+      "files": 2,
+      "insertions": 54,
+      "deletions": 10,
+      "areas": [
+        {
+          "path": "skills/dispatch",
+          "files": 2
+        }
+      ],
+      "kind": "skill",
+      "body": null,
+      "hours": null
+    },
+    {
+      "sha": "587d88379f2d2336e7d53ac0c7c3b1591cc5bb64",
+      "short": "587d8837",
+      "date": "2026-11-24T23:15:45+09:00",
+      "subject": "chore(changelog): regenerate after 3.6.1",
+      "pr": null,
+      "type": "chore",
+      "scope": "changelog",
+      "steps": [],
+      "files": 1,
+      "insertions": 80,
+      "deletions": 6,
+      "areas": [
+        {
+          "path": "docs",
+          "files": 1
+        }
+      ],
+      "kind": "chore",
+      "body": null,
+      "hours": null
+    },
     {
       "sha": "845c85f9c84dec16c874506f3b3f538b5b0bea58",
       "short": "845c85f9",
