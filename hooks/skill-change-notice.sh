@@ -13,7 +13,7 @@
 # First prompt of a session records and stays silent.
 
 SKILLS_DIR="$HOME/.claude/skills"
-WATCH="hub dispatch changelog"
+WATCH="hub books hub-handoff dispatch changelog"
 STATE_DIR="$HOME/.claude/hooks/state"
 
 input="$(cat)"
@@ -49,6 +49,6 @@ if [ -n "$changed" ]; then
   version=""
   pj="$HOME/Developer/claude/claude-hub-plugin/.claude-plugin/plugin.json"
   [ -f "$pj" ] && version="$(/usr/bin/python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("version",""))' "$pj" 2>/dev/null)"
-  echo "Installed skill(s) changed on disk since this session last loaded them:${changed}${version:+ (plugin $version)}. If this session runs one of them (/hub, /dispatch, /changelog), re-invoke it to reload before acting on anything else. Otherwise ignore this line."
+  echo "Installed skill(s) changed on disk since this session last loaded them:${changed}${version:+ (plugin $version)}. If this session runs one of them (/hub, /books, /hub-handoff, /dispatch, /changelog), re-invoke it to reload before acting on anything else. Otherwise ignore this line."
 fi
 exit 0

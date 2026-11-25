@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: Build or maintain a changelog that is DERIVED from git history rather than written by hand — a zero-dependency generator, a committed JSON payload, a CI gate, and a /changelog page. Use when the user asks for a changelog, release notes, a "what shipped" page, or a history of changes; when a hand-kept CHANGELOG.md has gone stale; when a dispatcher is told to regenerate the changelog after a merge train; or when anyone proposes writing changelog entries by hand.
+description: Build or maintain a changelog that is DERIVED from git history rather than written by hand — a zero-dependency generator, a committed JSON payload, a CI gate, and a /changelog page. Use when the user asks for a changelog, release notes, a "what shipped" page, or a history of changes; when a hand-kept CHANGELOG.md has gone stale; when the books regenerate the changelog after a merge train; or when anyone proposes writing changelog entries by hand.
 ---
 
 # Changelog Charter
@@ -92,7 +92,7 @@ Whatever the stack, the page **computes nothing about history**. It groups, coun
 
 Render the standing banner. Set a build-commit global from whatever the platform stamps (`VERCEL_GIT_COMMIT_SHA`, `COMMIT_REF`, `GITHUB_SHA`) and compare it to the entries: in the list means complete as of this build; not in the list means something merged after the payload and the page says so. With no stamp the page says it cannot tell. **Never let "unknown" render as "current"** — that is the one lie the whole page exists to prevent.
 
-### 6. Tell the dispatcher
+### 6. Tell the books
 
 Add one line to CLAUDE.md, under whatever heading holds repo commands:
 
@@ -100,7 +100,7 @@ Add one line to CLAUDE.md, under whatever heading holds repo commands:
 Changelog: `node scripts/changelog.mjs`
 ```
 
-The `dispatch` skill looks for exactly this — a `npm run changelog`, a `scripts/*changelog*`, or a note in CLAUDE.md — when it keeps the books after a merge train. Without the line it reports that the repo has no generator and moves on, and the page quietly falls behind.
+The `books` skill looks for exactly this — a `npm run changelog`, a `scripts/*changelog*`, or a note in CLAUDE.md — when it keeps the books after a merge train. Without the line it reports that the repo has no generator and moves on, and the page quietly falls behind.
 
 ## Job B: regenerate after merges
 
@@ -119,10 +119,10 @@ When `--check` fails, do not edit the payload. Regenerate it, and if the diff is
 
 ## Hours: what `periods` is, and what it is not
 
-The payload carries a `periods` array, copied verbatim from `~/.claude/dispatch/<repo>/hours.jsonl` when that file exists. Each line is one bookkeeping period the `dispatch` skill wrote: an `estimate_h` and a `confirmed_h`.
+The payload carries a `periods` array, copied verbatim from `~/.claude/dispatch/<repo>/hours.jsonl` when that file exists. Each line is one bookkeeping period the `books` skill wrote: an `estimate_h` and a `confirmed_h`.
 
-- `estimate_h` is **attention time**, inferred from typed messages in local session transcripts by `skills/dispatch/scripts/attention.py`. It is a proxy measured from keystrokes, not a record of work.
-- `confirmed_h` is what the user said when the dispatcher asked them to confirm or correct the estimate. It is their answer to a question, recorded once.
+- `estimate_h` is **attention time**, inferred from typed messages in local session transcripts by `skills/books/scripts/attention.py`. It is a proxy measured from keystrokes, not a record of work.
+- `confirmed_h` is what the user said when the daily hours report asked them to confirm or correct the estimate. It is their answer to a question, recorded once.
 
 **Neither is billable time, and neither was ever recorded as such.** Label them on the page in those words. A column of hours beside a changelog will be read as an invoice by the next person who opens it, and the estimate cannot support that reading. The generator does not compute hours, does not sum periods, and leaves each entry's `hours` field `null` — time is not derivable from a diff, and the generator does not invent what it cannot derive.
 
