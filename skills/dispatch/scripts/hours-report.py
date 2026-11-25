@@ -9,7 +9,9 @@
 
   hours-report.py --confirm --date YYYY-MM-DD repo=hours [repo=hours ...] [--note "..."]
       Record the user's confirmed hours for that day, one line per repo in that
-      repo's hours.jsonl. Use "repo=ok" to confirm the estimate as is.
+      repo's hours.jsonl. Use "repo=ok" to confirm the estimate as is. Each line carries
+      "confirmed_at" (UTC ISO-8601, seconds, +00:00): local bookkeeping for catch-up,
+      never sent to Superstudio (the ingest validator rejects unknown row keys).
 
 After either of those, the day's rows are POSTed to Superstudio's time-signals ingest
 (contract v1, docs/time/DATA-SOURCES.md section 6 in the superstudio repo), plus any
@@ -25,9 +27,11 @@ posted and nothing is printed. Titles, branch names and message text are never s
 
 The server fixes the waking day at 04:00 to 04:00, so a --day-start other than 04:00 fails
 payload validation and nothing is posted (the report itself is unaffected). Catch-up
-treats a day as stale when any repo's hours.jsonl holding a confirmation for it was
-modified after the day's last 200 in ~/.claude/dispatch/ingest-posted.jsonl, because
-those lines carry no timestamp; the extra re-posts are harmless.
+treats a day as stale when its newest confirmation's confirmed_at is later than the
+day's last 200 posted_at in ~/.claude/dispatch/ingest-posted.jsonl. Lines written before
+confirmed_at existed fall back to their hours.jsonl's mtime, so any later write to that
+file (e.g. an unrelated estimate line) makes such legacy days look freshly confirmed; the
+extra re-posts are harmless (the ingest is idempotent).
 
 A waking day D runs from D at --day-start (default 04:00) to D+1 at --day-start, so
 work at 1 a.m. belongs to the evening it continued from, not to a new date.
@@ -162,7 +166,8 @@ def confirm(args):
         est_h = round(est['minutes'] / 60, 2) if est else 0.0
         conf_h = est_h if val.strip().lower() == 'ok' else float(val)
         os.makedirs(os.path.join(DISPATCH, name), exist_ok=True)
-        rec = {'period': [args.date, args.date], 'estimate_h': est_h, 'confirmed_h': conf_h, 'note': args.note or ('confirmed as estimated' if val == 'ok' else 'corrected by user')}
+        rec = {'period': [args.date, args.date], 'estimate_h': est_h, 'confirmed_h': conf_h,
+               'confirmed_at': datetime.now(timezone.utc).isoformat(timespec='seconds'), 'note': args.note or ('confirmed as estimated' if val == 'ok' else 'corrected by user')}
         with open(os.path.join(DISPATCH, name, 'hours.jsonl'), 'a') as f: f.write(json.dumps(rec) + '\n')
         print(f"{name}: estimate {est_h} h, confirmed {conf_h} h")
     post_flow(args, args.date)
@@ -434,12 +439,22 @@ def posted_days():
     return out
 
 def newest_confirmation(day):
-    """Latest modification time of any repo's hours.jsonl that holds a confirmation covering the day (the lines carry no timestamp)."""
+    """Aware UTC datetime of the newest confirmation covering the day, comparable with posted_days() values.
+
+    Uses the record's confirmed_at. Legacy records without it (or with an unparseable one)
+    fall back to the modification time of their hours.jsonl, which over-reports when the
+    file is written for other reasons; that only causes harmless re-posts."""
     newest = None
     for path in glob.glob(os.path.join(DISPATCH, '*', 'hours.jsonl')):
-        if confirmations(os.path.basename(os.path.dirname(path)), day):
+        rec = confirmations(os.path.basename(os.path.dirname(path)), day)
+        if not rec: continue
+        t = None
+        try:
+            t = datetime.fromisoformat(rec['confirmed_at'])
+            if t.tzinfo is None: t = t.replace(tzinfo=timezone.utc)
+        except (KeyError, TypeError, ValueError):
             t = datetime.fromtimestamp(os.path.getmtime(path), timezone.utc)
-            if newest is None or t > newest: newest = t
+        if newest is None or t > newest: newest = t
     return newest
 
 def catch_up_candidates(today, skip=()):
