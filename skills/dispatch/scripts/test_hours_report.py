@@ -299,10 +299,12 @@ class CatchUp(Base):
     def posted(self, day, at):
         with open(hr.POSTED_LOG, 'a') as f:
             f.write(json.dumps({'day': day, 'posted_at': at.isoformat(), 'status': 200, 'accepted': 1, 'confirmed': 0, 'ignored': 0, 'unmapped': []}) + '\n')
-    def confirm_file(self, repo, day, mtime):
+    def confirm_file(self, repo, day, mtime, confirmed_at=None):
         os.makedirs(os.path.join(hr.DISPATCH, repo), exist_ok=True)
         p = os.path.join(hr.DISPATCH, repo, 'hours.jsonl')
-        open(p, 'w').write(json.dumps({'period': [day, day], 'estimate_h': 1, 'confirmed_h': 1.5, 'note': 'x'}) + '\n')
+        rec = {'period': [day, day], 'estimate_h': 1, 'confirmed_h': 1.5, 'note': 'x'}
+        if confirmed_at: rec['confirmed_at'] = confirmed_at.isoformat(timespec='seconds')
+        open(p, 'w').write(json.dumps(rec) + '\n')
         os.utime(p, (mtime.timestamp(), mtime.timestamp()))
 
     def test_picks_report_day_with_no_200_line(self):
@@ -321,6 +323,33 @@ class CatchUp(Base):
         self.posted('2026-10-20', datetime(2026, 10, 21, tzinfo=UTC)); self.posted('2026-10-21', datetime(2026, 10, 22, tzinfo=UTC))
         self.confirm_file('repo-a', '2026-10-20', datetime(2026, 10, 23, tzinfo=UTC))   # after the post
         self.confirm_file('repo-b', '2026-10-21', datetime(2026, 10, 21, tzinfo=UTC))   # before the post
+        self.assertEqual(hr.catch_up_candidates('2026-10-25'), ['2026-10-20'])
+
+    def test_confirm_writes_confirmed_at(self):
+        orig = hr.estimate; hr.estimate = lambda *a, **k: None
+        self.addCleanup(lambda: setattr(hr, 'estimate', orig))
+        a = self.args(no_post=True, date='2026-10-20', items=['repo-a=2'], note=None)
+        with contextlib.redirect_stdout(io.StringIO()):
+            hr.confirm(a)
+        rec = json.loads(open(os.path.join(hr.DISPATCH, 'repo-a', 'hours.jsonl')).read())
+        t = datetime.fromisoformat(rec['confirmed_at'])
+        self.assertTrue(rec['confirmed_at'].endswith('+00:00'))
+        self.assertEqual(t.microsecond, 0)
+        self.assertLess(abs((datetime.now(timezone.utc) - t).total_seconds()), 60)
+
+    def test_confirmed_at_decides_not_file_mtime(self):
+        self.report_file('2026-10-20'); self.report_file('2026-10-21')
+        self.posted('2026-10-20', datetime(2026, 10, 21, tzinfo=UTC)); self.posted('2026-10-21', datetime(2026, 10, 22, tzinfo=UTC))
+        late = datetime(2026, 10, 24, tzinfo=UTC)   # unrelated later write: mtime is after both posts
+        self.confirm_file('repo-a', '2026-10-20', late, confirmed_at=datetime(2026, 10, 23, tzinfo=UTC))   # confirmed after post
+        self.confirm_file('repo-b', '2026-10-21', late, confirmed_at=datetime(2026, 10, 21, tzinfo=UTC))   # confirmed before post
+        self.assertEqual(hr.catch_up_candidates('2026-10-25'), ['2026-10-20'])
+
+    def test_legacy_record_without_confirmed_at_falls_back_to_mtime(self):
+        self.report_file('2026-10-20')
+        self.posted('2026-10-20', datetime(2026, 10, 21, tzinfo=UTC))
+        self.confirm_file('repo-a', '2026-10-20', datetime(2026, 10, 23, tzinfo=UTC))
+        self.assertEqual(hr.newest_confirmation('2026-10-20'), datetime(2026, 10, 23, tzinfo=UTC))
         self.assertEqual(hr.catch_up_candidates('2026-10-25'), ['2026-10-20'])
 
     def test_catch_up_posts_the_days_and_skips_the_reported_one(self):
